@@ -23,7 +23,7 @@ public class LibraryTest {
 	}
 	
 	@Test public void testAutocomplete() {
-		Collection<Book> books = lib.autocomplete("ca opp har");
+		Collection<Book> books = lib.search("ca opp har");
 		assertEquals(1, books.size());
 		
 		System.out.println("[Results for ca opp har]");

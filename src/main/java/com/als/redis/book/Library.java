@@ -46,9 +46,18 @@ public class Library {
 		return books;
 	}
 
-	public Collection<Book> autocomplete(String allTerms) {
-		Set<String> terms = parseTerms(allTerms.toLowerCase(), " ");
-		Collection<String> bookKeys = indexRepo.findIntersection(terms);
+	public Collection<Book> search(String allTerms) {
+		Collection<String> bookKeys = null;
+		if (allTerms.contains("|")) {
+			Set<String> terms = parseTerms(allTerms, "|");
+			bookKeys = searchOr(terms);
+		} else if (allTerms.contains("+")) { 
+			Set<String> terms = parseTerms(allTerms, "+");
+			bookKeys = searchAnd(terms);
+		} else {//default to intersection
+			Set<String> terms = parseTerms(allTerms, " ");
+			bookKeys = searchAnd(terms);
+		}
 		
 		Collection<Book> books = bookRepo.findBooks(bookKeys);
 		
@@ -61,20 +70,6 @@ public class Library {
 		parsed.addAll(Arrays.asList(unparsed.split("["+token+"]")));
 		
 		return parsed;
-	}
-	
-	public Collection<Book> search(String allTerms) {
-		Collection<String> bookKeys = null;
-		if (allTerms.contains("|")) {
-			Set<String> terms = parseTerms(allTerms, "|");
-			bookKeys = searchOr(terms);
-		} else { //default to intersection
-			Set<String> terms = parseTerms(allTerms, "+");
-			bookKeys = searchAnd(terms);
-		}
-		Collection<Book> books = bookRepo.findBooks(bookKeys);
-		
-		return books;
 	}
 	
 	private Collection<String> searchAnd(Collection<String> terms) {
